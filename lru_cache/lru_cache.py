@@ -11,9 +11,9 @@ class LRUCache:
     """
 
     def __init__(self, limit=10):
-        self.limit = limit
+        self.limit = limit                # setting default or given limit
         self.items = DoublyLinkedList()
-        self.storage = {}
+        self.storage = {}                 # dictionary
 
 
     """
@@ -24,13 +24,12 @@ class LRUCache:
     key-value pair doesn't exist in the cache.
     """
     def get(self, key):
-        if key in self.storage:
-            node = self.storage[key]
-            self.items.move_to_front(node)
-            return node.value[1]
+        if key in self.storage:                           # looping thru dict for key
+            self.items.move_to_front(self.storage[key])   # if key is in dict move that node to the front
+            return self.storage[key].value[1]             # return the value
 
         else:
-            return None
+            return None                                   # return none if key is not in dict
 
     """
     Adds the given key-value pair to the cache. The newly-
@@ -43,16 +42,20 @@ class LRUCache:
     the newly-specified value.
     """
     def set(self, key, value):
+        # if key is in storage, move that node to the front of the list no need to add
         if key in self.storage:
             node = self.storage[key]
             node.value = (key, value)
             return self.items.move_to_front(node)
 
+        # if size is smaller then limit add key, value as a node and in cache
         if len(self.items) < self.limit:
             self.items.add_to_head((key, value))
             self.storage[key] = self.items.head
 
+        # If length equal to limit remove the tail and the key, value from the dict and add new node to the head
         elif len(self.items) == self.limit:
+            del self.storage[self.items.remove_from_tail()[0]]
             self.items.remove_from_tail()
             self.items.add_to_head((key, value))
             self.storage[key] = self.items.head
